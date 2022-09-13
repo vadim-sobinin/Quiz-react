@@ -1,3 +1,4 @@
+import React from 'react';
 import './index.scss';
 
 const questions = [
@@ -49,37 +50,54 @@ const questions = [
   },
 ];
 
-function Result() {
+function Result({correct}) {
   return (
     <div className="result">
       <img src="https://cdn-icons-png.flaticon.com/512/2278/2278992.png" />
-      <h2>You guessed 3 out of 10 answers</h2>
-      <button>Try again</button>
+      <h2>You guessed {correct} out of {questions.length} answers</h2>
+      <a href='/'>
+        <button>Try again</button>
+      </a>
     </div>
   );
 }
 
-function Game() {
+function Game({step, question, onClickVariant}) {
+  const percentage = Math.round(step/questions.length *100);
+  console.log(percentage)
   return (
     <>
       <div className="progress">
-        <div style={{ width: '50%' }} className="progress__inner"></div>
+        <div style={{ width: `${percentage}%` }} className="progress__inner"></div>
       </div>
-      <h1>Everything in React is a ...</h1>
+      <h1>{question.title}</h1>
       <ul>
-        <li>Module</li>
-        <li>Component</li>
-        <li>Class</li>
+        {
+          question.variants.map((text, index) => <li onClick={() => onClickVariant(index)} key={text}>{text}</li>)
+        }
       </ul>
     </>
   );
 }
 
 function App() {
+  const [step, setStep] = React.useState(0);
+  const question = questions[step];
+  const [correct, setCorrect] = React.useState(0)
+
+  const onClickVariant = (index) => {
+    if (question.correct == index) {
+      setCorrect(correct + 1)
+    }
+    setStep(step + 1)
+  }
+
   return (
     <div className="App">
-      <Game />
-      {/* <Result /> */}
+      {
+        step != questions.length ? <Game step={step} question = {question} onClickVariant={onClickVariant}/> : (
+        <Result correct={correct} />
+      )}
     </div>
   );
 }
